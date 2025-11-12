@@ -387,21 +387,12 @@ function getDefaultContextWindow(provider: string, model?: string): number {
 			default: 200000,
 		},
 		'claude-code': {
-			// Latest versions (4.x and 4.5)
 			'claude-sonnet-4-5': 200000,
 			'claude-haiku-4-5': 200000,
-			'claude-sonnet-4': 200000,
-			'claude-opus-4': 200000,
-			'claude-haiku-4': 200000,
-			// Generic latest
-			'claude-opus': 200000,
 			'claude-sonnet': 200000,
 			'claude-haiku': 200000,
-			// Legacy 3.x support
-			'claude-3-5-sonnet': 200000,
-			'claude-3-5-haiku': 200000,
-			'claude-3-5-sonnet-20241022': 200000,
-			'claude-3-5-haiku-20241022': 200000,
+			'claude-opus-4-1': 200000,
+			'claude-opus': 200000,
 			default: 200000,
 		},
 		gemini: {
