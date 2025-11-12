@@ -7,6 +7,8 @@ import { env } from '../../../env.js';
 import { logger } from '../../../logger/index.js';
 import { OpenAIService } from './openai.js';
 import { AnthropicService } from './anthropic.js';
+import { ClaudeCodeService } from './claude-code.js';
+import { createClaudeCode } from 'ai-sdk-provider-claude-code';
 import { OpenRouterService } from './openrouter.js';
 import { OllamaService } from './ollama.js';
 import { QwenService, QwenOptions } from './qwen.js';
@@ -24,7 +26,8 @@ function extractApiKey(config: LLMConfig): string {
 		provider === 'ollama' ||
 		provider === 'lmstudio' ||
 		provider === 'aws' ||
-		provider === 'azure'
+		provider === 'azure' ||
+		provider === 'claude-code'
 	) {
 		return 'not-required';
 	}
@@ -168,6 +171,22 @@ function _createLLMService(
 			const anthropic = new AnthropicClass({ apiKey });
 			return new AnthropicService(
 				anthropic,
+				config.model,
+				mcpManager,
+				contextManager,
+				config.maxIterations,
+				unifiedToolManager
+			);
+		}
+		case 'claude-code': {
+			// Create Claude Code provider using AI SDK
+			const provider = createClaudeCode({
+				defaultSettings: {
+					// Optional: can add default settings here
+				},
+			});
+			return new ClaudeCodeService(
+				provider,
 				config.model,
 				mcpManager,
 				contextManager,
@@ -365,6 +384,24 @@ function getDefaultContextWindow(provider: string, model?: string): number {
 			'claude-2.1': 200000,
 			'claude-2.0': 100000,
 			'claude-instant-1.2': 100000,
+			default: 200000,
+		},
+		'claude-code': {
+			// Latest versions (4.x and 4.5)
+			'claude-sonnet-4-5': 200000,
+			'claude-haiku-4-5': 200000,
+			'claude-sonnet-4': 200000,
+			'claude-opus-4': 200000,
+			'claude-haiku-4': 200000,
+			// Generic latest
+			'claude-opus': 200000,
+			'claude-sonnet': 200000,
+			'claude-haiku': 200000,
+			// Legacy 3.x support
+			'claude-3-5-sonnet': 200000,
+			'claude-3-5-haiku': 200000,
+			'claude-3-5-sonnet-20241022': 200000,
+			'claude-3-5-haiku-20241022': 200000,
 			default: 200000,
 		},
 		gemini: {

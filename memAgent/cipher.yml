@@ -28,6 +28,13 @@ llm:
   # apiKey: $ANTHROPIC_API_KEY
   # maxIterations: 50
 
+  # Claude Code (Native Auth - No API Key Required)
+  # Requires Claude Code CLI: npm install -g @anthropic-ai/claude-code
+  # Setup: claude setup-token
+  # provider: claude-code
+  # model: claude-3-5-sonnet-20241022
+  # maxIterations: 50
+
   # provider: openrouter
   # model: google/gemini-2.5-pro
   # apiKey: $OPENROUTER_API_KEY
