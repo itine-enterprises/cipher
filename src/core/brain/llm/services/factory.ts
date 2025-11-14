@@ -180,9 +180,14 @@ function _createLLMService(
 		}
 		case 'claude-code': {
 			// Create Claude Code provider using AI SDK
+			// Pass OAuth token if available (optional - falls back to claude login)
 			const provider = createClaudeCode({
 				defaultSettings: {
-					// Optional: can add default settings here
+					...(env.CLAUDE_CODE_OAUTH_TOKEN && {
+						env: {
+							CLAUDE_CODE_OAUTH_TOKEN: env.CLAUDE_CODE_OAUTH_TOKEN,
+						},
+					}),
 				},
 			});
 			return new ClaudeCodeService(

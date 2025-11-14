@@ -35,6 +35,35 @@ export class ClaudeCodeService implements ILLMService {
 		this.contextManager = contextManager;
 		this.maxIterations = maxIterations;
 		this.unifiedToolManager = unifiedToolManager;
+
+		// Validate model name and log warning if it doesn't match known patterns
+		this.validateModel(model);
+	}
+
+	/**
+	 * Validate that the model name is compatible with Claude Code
+	 * Logs a warning if the model doesn't match known patterns
+	 */
+	private validateModel(model: string): void {
+		const knownModels = ['opus', 'sonnet', 'haiku'];
+		const modelPatterns = [
+			/^claude-(opus|sonnet|haiku)(-\d+)?(-\d+)?$/, // claude-sonnet-4-5, claude-opus
+			/^opus$/,
+			/^sonnet$/,
+			/^haiku$/,
+		];
+
+		const isValid = modelPatterns.some(pattern => pattern.test(model));
+
+		if (!isValid) {
+			logger.warn(
+				`Model '${model}' doesn't match known Claude Code model patterns. ` +
+					`Supported models: ${knownModels.join(', ')} or full model IDs like 'claude-sonnet-4-5'. ` +
+					`The provider may still work with custom model names.`
+			);
+		} else {
+			logger.debug(`Using Claude Code model: ${model}`);
+		}
 	}
 
 	/**
@@ -44,6 +73,18 @@ export class ClaudeCodeService implements ILLMService {
 		this.eventManager = eventManager;
 	}
 
+	/**
+	 * Generate a response from the Claude Code model
+	 * @param userInput - The user's input message
+	 * @param imageData - Optional image data to include
+	 * @param _stream - Streaming parameter (currently not supported by Claude Code provider)
+	 * @returns Promise<string> - The generated response
+	 *
+	 * Note: Streaming is not currently implemented for Claude Code provider.
+	 * The AI SDK's claude-code provider uses the Claude CLI which doesn't expose
+	 * streaming capabilities in the same way as the Anthropic API. This may be
+	 * added in a future version if the underlying provider adds support.
+	 */
 	async generate(userInput: string, imageData?: ImageData, _stream?: boolean): Promise<string> {
 		await this.contextManager.addUserMessage(userInput, imageData);
 
@@ -336,7 +377,7 @@ export class ClaudeCodeService implements ILLMService {
 								role: 'assistant' as const,
 								content: msg.content || '',
 								toolInvocations: msg.tool_calls.map((tc: any) => ({
-									state: 'result' as const,
+									state: 'call' as const, // Initial state is 'call', will be updated to 'result' after merging
 									toolCallId: tc.id,
 									toolName: tc.function.name,
 									args: JSON.parse(tc.function.arguments),
@@ -365,6 +406,13 @@ export class ClaudeCodeService implements ILLMService {
 							);
 							if (toolResultMsg) {
 								invocation.result = toolResultMsg.content;
+								invocation.state = 'result' as const; // Update state to 'result' after merging
+							} else {
+								// Warn about missing tool result
+								logger.warn(
+									`No result found for tool invocation: ${invocation.toolName} (ID: ${invocation.toolCallId})`
+								);
+								logger.debug('This may indicate an issue with tool result tracking in the conversation history');
 							}
 						}
 					}
