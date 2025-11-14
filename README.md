@@ -127,9 +127,10 @@ Cipher supports multiple configuration options for different deployment scenario
 ```yaml
 # LLM Configuration
 llm:
-  provider: openai # openai, anthropic, openrouter, ollama, qwen
+  provider: openai # openai, anthropic, claude-code, openrouter, ollama, qwen
   model: gpt-4-turbo
   apiKey: $OPENAI_API_KEY
+  # For Claude Code (native auth): provider: claude-code, no apiKey needed
 
 # System Prompt
 systemPrompt: 'You are a helpful AI assistant with memory capabilities.'
@@ -159,6 +160,12 @@ Create a `.env` file in your project root with these essential variables:
 # ====================
 OPENAI_API_KEY=sk-your-openai-api-key
 ANTHROPIC_API_KEY=sk-ant-your-anthropic-key
+
+# Claude Code (Native Auth - No API Key Required)
+# Requires Claude Code CLI: npm install -g @anthropic-ai/claude-code
+# Setup: claude setup-token
+# CLAUDE_CODE_OAUTH_TOKEN=your-oauth-token-here
+
 GEMINI_API_KEY=your-gemini-api-key
 QWEN_API_KEY=your-qwen-api-key
 

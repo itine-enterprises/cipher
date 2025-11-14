@@ -82,6 +82,7 @@ export const LLMConfigSchema = z
 		const supportedProvidersList = [
 			'openai',
 			'anthropic',
+			'claude-code',
 			'openrouter',
 			'ollama',
 			'lmstudio', // Added LM Studio as a supported provider
@@ -135,14 +136,15 @@ export const LLMConfigSchema = z
 		} else if (
 			providerLower !== 'ollama' &&
 			providerLower !== 'aws' &&
-			providerLower !== 'lmstudio'
+			providerLower !== 'lmstudio' &&
+			providerLower !== 'claude-code'
 		) {
-			// Non-Ollama, non-AWS, non-LMStudio providers require an API key
+			// Non-Ollama, non-AWS, non-LMStudio, non-Claude-Code providers require an API key
 			if (!data.apiKey || data.apiKey.trim().length === 0) {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
 					path: ['apiKey'],
-					message: `API key is required for provider '${data.provider}'. Only Ollama, LM Studio, and AWS (with IAM roles) don't require an API key.`,
+					message: `API key is required for provider '${data.provider}'. Only Ollama, LM Studio, AWS (with IAM roles), and Claude Code don't require an API key.`,
 				});
 			}
 		}

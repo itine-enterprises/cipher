@@ -23,6 +23,7 @@ const envSchema = z.object({
 	REDACT_SECRETS: z.boolean().default(true),
 	OPENAI_API_KEY: z.string().optional(),
 	ANTHROPIC_API_KEY: z.string().optional(),
+	CLAUDE_CODE_OAUTH_TOKEN: z.string().optional(),
 	OPENROUTER_API_KEY: z.string().optional(),
 	QWEN_API_KEY: z.string().optional(),
 	OPENAI_BASE_URL: z.string().optional(),
@@ -163,6 +164,8 @@ export const env: EnvSchema = new Proxy({} as EnvSchema, {
 				return process.env.OPENAI_API_KEY;
 			case 'ANTHROPIC_API_KEY':
 				return process.env.ANTHROPIC_API_KEY;
+			case 'CLAUDE_CODE_OAUTH_TOKEN':
+				return process.env.CLAUDE_CODE_OAUTH_TOKEN;
 			case 'OPENROUTER_API_KEY':
 				return process.env.OPENROUTER_API_KEY;
 			case 'QWEN_API_KEY':
@@ -455,6 +458,7 @@ export const validateEnv = () => {
 		REDACT_SECRETS: process.env.REDACT_SECRETS === 'false' ? false : true,
 		OPENAI_API_KEY: process.env.OPENAI_API_KEY,
 		ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+		CLAUDE_CODE_OAUTH_TOKEN: process.env.CLAUDE_CODE_OAUTH_TOKEN,
 		OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
 		QWEN_API_KEY: process.env.QWEN_API_KEY,
 		OPENAI_BASE_URL: process.env.OPENAI_BASE_URL,
