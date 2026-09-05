@@ -38,7 +38,7 @@ two months of every "by month" series as a floor.
 
 ---
 
-## Lead 1 (cash in weeks): "Mindbody Exit" done-for-you migration service for boutique studios
+## Lead 1 (cash in weeks): "Mindbody Exit" done-for-you migration service for one-location studios
 
 **Capterra / G2.** Mindbody is the lowest-rated high-volume product in every Capterra
 category it appears in: 4.0 overall, 3.6 value, 3.8 support, 3.9 ease of use, 2,994 reviews,

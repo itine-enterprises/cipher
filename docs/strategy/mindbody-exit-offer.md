@@ -3,7 +3,7 @@
 Source: The Startup Ideas Podcast, Greg Isenberg with Corey Ganim, "The $1,000/hour Solo AI
 business (Full Course)". Corey sells a $999 "AI Tools Assessment" to small businesses and
 converts about half into implementation and retainer work. Below is his system, quoted,
-and then the same system pointed at boutique studios stuck on Mindbody.
+and then the same system pointed at one-location studios stuck on Mindbody.
 
 ## Corey's system, as stated on the episode
 
@@ -60,7 +60,7 @@ Corey's model is generic (any small business, any pain). Ours is narrower and th
 easier: one vertical, one villain, one outcome. Every studio owner on r/mindbody already
 knows the pain; the audit's job is to put a number on it and a date on the exit.
 
-**Positioning.** "The Mindbody exit guy." Niche by vertical (boutique fitness: Pilates,
+**Positioning.** "The Mindbody exit guy." Niche by vertical (studio and gym: Pilates,
 yoga, barre, dance, martial arts, small gyms), not geography, because the customers are
 already gathered in five subreddits and one Capterra review page.
 
