@@ -45,13 +45,12 @@ category it appears in: 4.0 overall, 3.6 value, 3.8 support, 3.9 ease of use, 2,
 388 of them 1 or 2 stars. Reviewers are owner-operators of single-location Pilates, barre,
 yoga, dance, and martial-arts studios. Their words: "$1,200, 1-year contract, their sales
 people appear to be on commission"; bills from ~$99/mo to $699+/mo per location before
-add-ons; "over $1,000 CAD/month, almost impossible to get real help"; a $499 data-export
-fee that appears only when you leave. G2: cost is the most-cited complaint, with hidden
+add-ons; "over $1,000 CAD/month, almost impossible to get real help"; a paid export for stored card data, reported at about $500, that appears only when you leave (standard client exports are free). G2: cost is the most-cited complaint, with hidden
 fees and high processing rates.
 
 **Google Trends.** "mindbody" brand search is flat for 5 years at a large volume, and every
 rising query is exit intent: "mindbody alternatives" +250%, "mindbody pricing" +190%,
-"mindbody reviews" +100%, competitor "vagaro" +300%. Mindbody reports 60,000+ businesses.
+"mindbody reviews" +100%, competitor "vagaro" +300%. Mindbody's site says more than 40,000 businesses.
 
 **Reddit, pulled directly.** 157 posts and 506 comments in r/mindbody, r/gymowner,
 r/FitnessStudioOwner, r/pilates, r/YogaTeachers, r/personaltraining since Sept 2025.

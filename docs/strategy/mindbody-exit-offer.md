@@ -34,7 +34,7 @@ sometimes five"), next steps.
 
 **Phase 4, review call (30 min, screen-share).** Walk each recommendation. Three closing
 questions: "Which of these is most urgent for you?" "Do you want to do this yourself, or
-would you like my help implementing?" "What's your timeline?" 50-60% buy implementation.
+would you like my help implementing?" "What's your timeline?" roughly half buy implementation (Corey's self-reported figure; episode aired July 13, 2026).
 The $999 is credited toward it ("instead of 5K, it's 4K").
 
 **Upsell menu.** Process redesign $3,000-3,500. One Zapier/Make build ~$1,500. Custom
@@ -72,8 +72,8 @@ migration carry the ticket. His ramp applies exactly: first two free, then $199,
 
 **Guarantee.** "If the audit does not find at least $1,500 a year in savings or a
 contract exit you did not know you had, full refund." The Capterra and Reddit data says
-the average studio is paying 50% more than when they signed and 3.5% processing on
-debit cards, so this guarantee is safe.
+Capterra and BBB reviews consistently describe year-over-year increases and features moved
+into pricier tiers, and Mindbody's terms auto-renew for 12 to 36 months, so this guarantee is safe.
 
 ### Phase 1: discovery call, 30 min, recorded
 
@@ -90,6 +90,19 @@ Same rule: pull problems, pitch nothing. The studio version of Corey's questions
   website widget tied to Mindbody?
 Ask them to send the contract, the last three invoices, and a screenshot of their pricing
 options before the call.
+
+### The stored-card reality, verified
+
+Vagaro's and WellnessLiving's own help articles say they do not import stored cards
+(WellnessLiving: "cannot be imported due to privacy and security regulations"; Vagaro:
+"Contact Mindbody"). TeamUp imports cards only from a Stripe or GoCardless account the studio
+already owns. Mindbody Payments runs on Stripe, but Mindbody owns the account, so Stripe's
+processor-to-processor export can only be initiated by Mindbody, through its paid encrypted
+export (reported at about $500). Three cases, decided in the audit: (A) Mindbody paid export
+to a destination that accepts it, (B) TeamUp import from the studio's own Stripe, (C) a re-card
+campaign during the parallel week: email and text sequence, tablet at check-in, first charge
+confirmed before Mindbody autopays are cancelled. Case C is the common one and is most of the
+migration's value.
 
 ### Phase 2: analysis in Claude, saved as a skill after the third one
 
@@ -126,7 +139,7 @@ like my help?" "What's your timeline?" The $199 is credited against the migratio
 | Package | Price | Corey's equivalent |
 |---|---|---|
 | Full Migration | $1,200-1,800 | Full implementation |
-| Stored-card transfer only (Stripe PAN export coordination) | $500 | One Zapier build |
+| Stored-card handling only: Mindbody export request, or re-card campaign | $500 | One Zapier build |
 | Reporting rebuild (the Google Sheets dashboard they already keep) | $400 | Process redesign, small |
 | Studio Ops retainer | $149-299/mo, one call a month plus text access | AI Concierge |
 
