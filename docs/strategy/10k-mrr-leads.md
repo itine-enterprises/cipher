@@ -1,8 +1,13 @@
-# Three Leads to $10K MRR, sourced from Capterra, G2, Consumer Reports, and Google Trends
+# Three Leads to $10K MRR, sourced from Capterra, G2, Consumer Reports, Google Trends, and Reddit (Arctic Shift)
 
 Researched 2026-09-05. Primary sources: Capterra and G2 (review volume, sub-scores, 1-star
 themes), Consumer Reports (privacy, junk fees, cancellation), Google Trends (US, 12-month and
-5-year, pulled directly). Reddit is used only as a tiebreaker.
+5-year, pulled directly with `trends_probe.py`). Reddit was pulled directly through the
+Arctic Shift API with `reddit_arctic_shift.py` (posts and comments since 2025-09-01).
+
+**Scope rule from the founder: no mental-health or medical positioning.** ADHD, therapy,
+sleep, and anything that implies treatment are out on compliance grounds. All three leads
+below are business tooling or productivity.
 
 ## What the sources say, in one table
 
@@ -10,177 +15,192 @@ themes), Consumer Reports (privacy, junk fees, cancellation), Google Trends (US,
 |---|---|---|
 | Mindbody overall / value-for-money | Capterra, 2,994 reviews | 4.0 / 3.6 (lowest in category) |
 | Mindbody 1-2 star reviews | Capterra | 388 (13%) |
-| Mindbody cost complaints | G2 | "most frequently cited concern"; prohibitive for small/new studios |
+| Mindbody cost complaints | G2 | "most frequently cited concern"; prohibitive for small studios |
+| Reddit posts mentioning Mindbody, studio-owner subs, 12 mo | Arctic Shift | 157 posts, 506 comments |
+| ...of which about switching / leaving | Arctic Shift | 54 posts, 204 comments |
+| ...of which about price / fees | Arctic Shift | 88 posts, 231 comments |
 | "mindbody alternatives" search | Google Trends, rising 12-mo | +250% |
 | "mindbody pricing" search | Google Trends, rising 12-mo | +190% |
-| "mindbody" brand search, 5-year | Google Trends | flat at ~58 of peak 100 (large, stable base) |
-| "screen time app" search, 5-year | Google Trends | 8.9 to 37.0 (4x), still rising over last 12 mo |
-| "app to reduce screen time" | Google Trends, rising 12-mo | +90% |
-| "adhd app" search, 5-year | Google Trends | 4.9 to 20.6 (4x); flat-to-down last 12 mo |
-| "adhd" search, 12-month | Google Trends | 72 to 79 and rising |
-| Mental health apps failing privacy | Consumer Reports + follow-on study | 28 of top 32 |
+| "screen time app" search, 5-year | Google Trends | 8.9 to 37.0 (4x), still rising |
+| Reddit posts mentioning a screen-time app, 12 mo | Arctic Shift | 739 |
+| ...bypass complaints / asking for a recommendation | Arctic Shift | 95 / 196 |
+| Reddit "lock in" / study-together posts, 12 mo | Arctic Shift | 979 |
+| ...asking for a partner or group | Arctic Shift | 341 |
+| "locked in" search, 12-mo | Google Trends | 56 to 70 |
+| "study app" search, 12-mo | Google Trends | 13 to 20 |
 | Junk fees per family per year | Consumer Reports | $3,200 |
-| "brain rot" search, 12-month | Google Trends | 93 to 18 (dead meme) |
-| "sleepmaxxing", "ugc ads" search | Google Trends | ~0 to 1 (no demand) |
+| "brain rot", "sleepmaxxing", "ugc ads" search | Google Trends | dead or ~0 |
 
-Terms in the same Trends group are relative to each other. Anchored in one group:
+Trends terms in one group are relative to each other. Anchored in one group:
 `adhd` 79, `screen time app` 4.9, `mindbody` 2.0, `app blocker` 0.9, `personal trainer app` 0.
+Arctic Shift's most recent 4-6 weeks are under-counted (ingestion lag), so treat the last
+two months of every "by month" series as a floor.
 
 ---
 
 ## Lead 1 (cash in weeks): "Mindbody Exit" done-for-you migration service for boutique studios
 
-**The Capterra/G2 evidence.** Mindbody is the lowest-rated high-volume product in every
-Capterra category it appears in (personal trainer, coaching, nutritionist): 4.0 overall,
-3.6 value, 3.8 support, 3.9 ease of use, on 2,994 reviews. 388 of those are 1 or 2 stars.
-The 1-star reviews are owner-operators of single-location Pilates, barre, yoga, dance, and
-martial-arts studios. Their exact complaints:
-- "$1,200, 1-year contract, their sales people appear to be on commission"
-- pricing that climbed from ~$99/mo to $699+/mo per location before add-ons
-- "My subscription has climbed to over $1,000 CAD/month. It's almost impossible to get real help"
-- a $499 data-export fee that surfaces only when you try to leave
-- auto-renewals and scheduled downgrades that disappear from the system
-G2 corroborates: cost is the most frequently cited complaint, with hidden fees and high
-processing rates, and reviewers warn small studios away from it.
+**Capterra / G2.** Mindbody is the lowest-rated high-volume product in every Capterra
+category it appears in: 4.0 overall, 3.6 value, 3.8 support, 3.9 ease of use, 2,994 reviews,
+388 of them 1 or 2 stars. Reviewers are owner-operators of single-location Pilates, barre,
+yoga, dance, and martial-arts studios. Their words: "$1,200, 1-year contract, their sales
+people appear to be on commission"; bills from ~$99/mo to $699+/mo per location before
+add-ons; "over $1,000 CAD/month, almost impossible to get real help"; a $499 data-export
+fee that appears only when you leave. G2: cost is the most-cited complaint, with hidden
+fees and high processing rates.
 
-**The Google Trends evidence.** "mindbody" brand search has been flat for 5 years at a
-large volume (about 40% of "screen time app"), and the rising queries around it are all exit
-intent: "mindbody alternatives" +250%, "mindbody pricing" +190%, "mindbody reviews" +100%,
-and competitor "vagaro" +300%. Mindbody reports 60,000+ businesses.
+**Google Trends.** "mindbody" brand search is flat for 5 years at a large volume, and every
+rising query is exit intent: "mindbody alternatives" +250%, "mindbody pricing" +190%,
+"mindbody reviews" +100%, competitor "vagaro" +300%. Mindbody reports 60,000+ businesses.
 
-**Reddit tiebreaker.** r/mindbody, r/pilates, r/gymowner, r/YogaTeachers say the same
-things and add the real blocker: migration is painful. Operators migrate manually to dodge
-the $499 export fee, stored card tokens need a separate PCI transfer, and one vendor
-(Arketa) is called out for a migration "horror story." Mindbody Payments runs on Stripe,
-so token migration is a documented Stripe PAN-export process, not magic.
+**Reddit, pulled directly.** 157 posts and 506 comments in r/mindbody, r/gymowner,
+r/FitnessStudioOwner, r/pilates, r/YogaTeachers, r/personaltraining since Sept 2025.
+Comment volume is rising: 19 in Sept 2025, 90 in May 2026, 65 in July 2026. Top threads:
+"Anyone switched away from Mindbody?", "Thinking of moving off of Mindbody", "Has anyone
+migrated away from Mindbody?", "Mindbody outage got me thinking about switching",
+"Arketa - What a nightmare", "Arketa Migration - Not what they promised". Quotes:
+- "Mindbody makes it almost impossible to leave. Everything is tied to..."
+- "I plan to cancel their recurring memberships after we migrate, but I'm worried about the stored card data. Do I need to manually clear every client's payment info?"
+- "Was on the phone with a specialist who scheduled the downgrade and a cancellation... they have no record of a downgrade"
+- "Last week's outage was like 6+ hours... already annoyed with the price and support, this pushed me over"
+- "We're paying over 50% more right now than when we first started, with less service"
+- "When a client cancels a class from a package that was transferred over, the credit does not get returned" (a botched migration)
+Also notable: vendors (Vibefam, Time2book, YogaCRM) are already astroturfing these
+threads, which tells you they will pay for referred studios.
 
-**The offer.** A fixed-price, done-for-you switch off Mindbody:
+**The offer.**
 | Package | Price | What you do |
 |---|---|---|
-| Exit Audit | $199 | Read their contract, find the renewal window, compute the true cost, recommend a target platform |
-| Full Migration | $1,200 to $1,800 | Export members/packages/memberships, rebuild schedule and pricing on the new platform, coordinate the Stripe token transfer, run a parallel week, cut over |
-| Retainer | $149/mo | Reporting dashboard (their #1 non-price complaint), monthly check-in |
+| Exit Audit | $199 | Read the contract, find the renewal window, compute true cost, pick the target platform |
+| Full Migration | $1,200 to $1,800 | Export members/packages/memberships, rebuild schedule and pricing, coordinate the Stripe token transfer (Mindbody Payments runs on Stripe), run a parallel week, cut over, verify package credits |
+| Retainer | $149/mo | Reporting dashboard (the #1 non-price complaint) and a monthly check-in |
 
-Six full migrations a month is $7K to $10K plus retainers. Every target platform (Vagaro,
-WellnessLiving, Vibefam, Momence, Glofox) has sales teams that want these studios; ask
-each for a referral or partner deal on day one since none publish one openly.
+Six migrations a month is $7K to $10K before retainers and vendor referrals.
 
-**Where the first 10 customers are.** The Capterra 1-star reviewers are public with name,
-role, and business type. Post daily in r/mindbody and r/pilates answering "how do I leave"
-threads. Run a $5/day Google Ads campaign on "mindbody alternatives" and "mindbody
-pricing" (both rising). Cold-email studios whose Mindbody contracts renew in Q4.
+**Where the first 10 customers are.** The 54 Reddit posts above are people asking to be
+sold this, by name. Capterra 1-star reviewers are public with role and business type.
+$5/day Google Ads on "mindbody alternatives" and "mindbody pricing". Ask Vagaro,
+WellnessLiving, Vibefam, Momence, and Glofox for a referral deal on day one; none publish
+one, all have sales teams hunting these studios.
 
-**30-day plan.** Days 1-5: do one free migration for a local studio to build the checklist
-and a testimonial. Days 6-15: 20 outreach touches per day, sell the $199 audit. Days 16-30:
-convert audits to migrations. If you have no paid audit by day 14, the price or the channel
-is wrong.
+**30-day plan.** Days 1-5: one free migration for a local studio to build the checklist and
+testimonial. Days 6-15: 20 touches a day, sell the $199 audit. Days 16-30: convert audits
+to migrations. No paid audit by day 14 means the price or channel is wrong.
 
-**Risks.** You are moving live billing; run the parallel week every time. Get a signed
-scope so a studio's messy data is not your liability.
+**Risks.** Live billing is involved; always run the parallel week and verify package
+credits (the exact failure in the Arketa threads). Signed scope per studio.
 
 ---
 
-## Lead 2 (biggest structural demand, ship second): screen-time app that cannot be bypassed and is honest about billing
+## Lead 2 (ship now, no Apple gate): "Lock In" social study sessions for students
 
-**The Google Trends evidence.** "screen time app" is the strongest B2C signal in the
-dataset: up 4x over 5 years and still climbing in the last 12 months while every meme-driven
-term ("brain rot", "dopamine detox", "sleepmaxxing") has collapsed. The rising queries are
-intent, not curiosity: "how to reduce screen time" +170%, "app to reduce screen time" +90%,
-"best screen time app" +70%. "study app" is also up (13 to 20) and "locked in" (56 to 70)
-is the Gen Z framing.
+**Google Trends.** "locked in" rose from 56 to 70 over 12 months and "study app" from 13
+to 20. Both are Gen Z framing for the same thing: sitting down and doing the work.
 
-**The review evidence.** App Store 1-star reviews of Opal, one sec, ScreenZen, Jomo,
-Forest, and Freedom split into two piles: apps that are trivially bypassed (delete the
-app, change the date, tap "ignore") and apps that trap people in trials that auto-convert
-to a $99/year charge with a hidden cancel flow. An independent Oct 2025 to Apr 2026 test
-found teenagers bypassed 12 of 18 blockers within 48 hours.
+**Reddit, pulled directly.** 979 posts in r/GetStudying, r/studytips, r/getdisciplined,
+r/college, r/productivity since Sept 2025 about locking in or studying together, 341 of
+them explicitly asking for a partner or group and 263 naming the phone as the problem.
+This is the highest-engagement corpus in the whole research: "Lock in with me!" (+1,583),
+"that's it. i'm locking in" (+1,558), "Saw this, and it has become my motivation to lock
+in for this semester" (+4,761), "Day 2 - trying to study 10 hours a day" (+1,284, 151
+comments). Quotes:
+- "Create some discord group / community for people DEDICATED TO STUDY, where we can do something together" (+784)
+- "I'll hop on studystream or similar platforms where people are just studying together. It's weirdly motivating" (+225)
+- "Willing to pay if it's not too expensive and actually works (and preferably has a student discount!). $30 a month with no student discount is a joke" (+453)
+- "I'm wondering if I'd be better off studying [alone]... it's easier to complain together than to sit quietly and grind" (+185)
+Volume peaks Sept to Nov (semester start). It is September now.
 
-**The Consumer Reports evidence.** CR does not rate screen-time apps, but its junk-fee and
-subscription work is the marketing angle: hidden fees cost a family $3,200 a year, and New
-York City's click-to-cancel rule takes effect October 1, 2026. "Cancel in one tap, no
-annual auto-convert" is a feature you can advertise because the category leader does not.
+**Capterra / G2.** No coverage; this is a consumer category. The nearest B2C comps are
+StudyStream (free, web), Focusmate ($6.99, 1:1 video, must book), Flow Club ($19-25), and
+Forest. None of them is a phone-native "lock in with your friends" room with a streak.
 
-**The wedge.** Friend-accountability blocker at $4.99/mo or $29.99/yr, monthly-first
-pricing with a visible cancel button, and a "strict mode" that survives the known
-bypasses. Opal (2/3 of its 1M daily users are students) proved the freemium student
-motion; the middle between free ScreenZen and $19.99 Opal is open.
+**Consumer Reports.** Use the junk-fee and cancellation findings as the pricing promise:
+monthly-first, visible cancel, real student price.
 
-**Why it ships second.** Blocking apps requires Apple's FamilyControls entitlement, and in
-2026 indie developers report 10 to 14+ day waits with no reply, then a second wait for the
-Shield extension. Submit the entitlement request on day 1 of Lead 1. Build starts when it
-is approved.
+**The wedge.** Start or join a "lock in" room with friends or strangers, timer plus
+camera-optional presence, phone-down detection using the app's own foreground state (no
+FamilyControls needed), streaks and a shareable "hours locked in this week" card for
+TikTok. Free for 2 sessions a day, $3.99/mo or $24.99/yr with a verified student price.
+$10K MRR is roughly 2,500 monthly subscribers, which is one viral semester-start post.
 
----
+**30-day plan.** Week 1: SwiftUI room + timer + presence, RevenueCat paywall. Week 2:
+TestFlight to 30 people recruited from the 341 "looking for a partner" posters. Week 3:
+App Store submit, daily "lock in with me" TikToks using the app's own share card.
+Week 4: campus Discord seeding, student-discount landing page.
 
-## Lead 3 (Gen Z, brand-led): the honest ADHD app, privacy-first and no bait pricing
-
-**The Google Trends evidence.** "adhd" is the largest and still-rising term in the whole
-dataset (72 to 79 over 12 months). "adhd app" quadrupled over 5 years and has plateaued,
-which means the demand is now being served, badly. The single breakout query under
-"adhd app" is "wellverse" at +33,550%.
-
-**What Wellverse is.** Trustpilot, BBB Scam Tracker, TikTok, and YouTube reviews describe a
-web page saved as a home-screen icon, sold at $19.99/month that silently becomes $49.99,
-with no reminders, no refunds, and a hidden unsubscribe. This is the fastest-growing thing
-in the ADHD app category right now. That is the opportunity: the demand is real and the
-top-of-funnel is being captured by a product people call a scam.
-
-**The Consumer Reports evidence.** CR's Digital Lab found mental-health apps sharing device
-identifiers with Facebook and others without business-associate agreements, and that HIPAA
-does not cover most of them; a follow-on study found 28 of the top 32 fail on privacy. CR
-tells consumers to look for private-account options and clear data-sharing disclosure.
-Nobody in the ADHD app category leads with that.
-
-**The Capterra/G2 evidence.** These sites do not cover consumer ADHD apps; the nearest
-signal is the body-doubling market: Focusmate $6.99, Flow Club $19-25, FLOWN $19-25,
-dubbii (App Store complaints: "just two creators making how-to videos", unclear pricing,
-sessions that fail to join).
-
-**The wedge.** An on-demand voice "body double" that walks you through a task in 5-minute
-chunks, with three brand promises printed on the paywall: data stays on your phone, the
-price you see is the price you pay, cancel in one tap. Hard paywall, 3-day trial,
-$9.99/mo or $49.99/yr. Health and Fitness is the highest trial-to-paid category on iOS
-(35%). Every Wellverse complaint video on TikTok is a comment section you can be in.
-
-**Why it is third.** The Trends line is flat over 12 months, so growth has to come from
-brand and distribution rather than the category pulling you up. It has no Apple gate, so
-it can be built in 2-3 weeks whenever Lead 2 is stuck waiting on Apple.
+**Risks.** Seasonal; expect a dip in December and May. Group video costs money; keep
+presence lightweight (audio-off, low-fps) and cap free rooms.
 
 ---
 
-## Rejected, with the source that killed it
+## Lead 3 (biggest structural demand, gated by Apple): screen-time blocker that survives bypass and is honest about billing
 
-- **AI UGC ad service.** "ugc ads" and "ai ugc" register ~1 on Trends. No search demand;
-  it would be pure outbound. Keep the pipeline for your own app marketing only.
-- **Sleep / sleepmaxxing.** Trends is 0. Category is hardware-led (Oura).
-- **"Brain rot" positioning.** 93 to 18 in 12 months. Do not name a product after it.
-- **Personal trainer app (Trainerize-style).** Capterra shows Trainerize at 4.6 with only
-  3-star complaints about price and MyFitnessPal sync; "personal trainer app" is 0 on
-  Trends. Trainers are already well served by PT Distinction, Everfit, and TrueCoach.
-- **Tutoring software.** WizIQ is 3.6 on 121 reviews, but the category is small and
-  dominated by Acuity at 4.8 on 5,758 reviews.
+**Google Trends.** "screen time app" is up 4x over 5 years and still rising over the last
+12 months while every meme term ("brain rot" 93 to 18, "dopamine detox") collapsed. Rising
+queries are intent: "how to reduce screen time" +170%, "app to reduce screen time" +90%,
+"best screen time app" +70%.
+
+**Reddit, pulled directly.** 739 posts mentioning a screen-time app (Opal, ScreenZen,
+one sec, Brick, Forest, etc.) in r/digitalminimalism, r/iphone, r/nosurf, r/studytips,
+r/getdisciplined since Sept 2025: 196 asking for a recommendation, 108 about price or
+cancellation, 95 about bypassing, 170 mentioning a friend or accountability. Quotes:
+- "0/10. Disgustingly easy to bypass. Almost impressed with my ability to hit '15 more minutes' twelve times in a row" (+887, the top-rated review post in r/digitalminimalism)
+- "The problem was simple: I could always bypass the restrictions myself" (+248)
+- "I got Opal about a month ago; however, I've realized I could've saved $100 by just having a friend lock my Screen Time limits with a passcode of their own" (+50)
+That last one is the product spec.
+
+**App Store 1-star reviews.** Two piles: trivially bypassed (delete the app, change the
+date, tap ignore) and trials that auto-convert to $99/yr with a hidden cancel. An
+independent Oct 2025 to Apr 2026 test had teenagers bypassing 12 of 18 blockers within 48
+hours.
+
+**Consumer Reports.** Junk fees cost a family $3,200 a year; New York City's click-to-cancel
+rule takes effect October 1, 2026. "Cancel in one tap, no annual auto-convert" is a
+feature the category leader does not have.
+
+**The wedge.** A friend holds the key. You set the block, your friend's passcode is the only
+way to unlock early, and they get pinged when you try. $4.99/mo or $29.99/yr, monthly-first,
+visible cancel. Opal proved the student freemium motion (two-thirds of its 1M daily users
+are students) and the price gap between free ScreenZen and $19.99 Opal is open.
+
+**Why it is third.** Blocking requires Apple's FamilyControls entitlement, and in 2026
+indie developers report 10 to 14+ day waits with no reply, then a second wait for the
+Shield extension. Submit the request on day 1. Lead 2 ships while you wait, and Lead 2's
+users are Lead 3's first users.
+
+---
+
+## Dropped, with the source that killed it
+
+- **ADHD / body-doubling / any mental-health app.** Founder decision: compliance. The demand
+  is real (Trends, Reddit) but Consumer Reports' privacy findings and the health-data
+  rules that follow make it the wrong first product.
+- **AI UGC ad service.** "ugc ads" and "ai ugc" are ~1 on Trends. No inbound demand.
+- **Sleep / sleepmaxxing.** Trends 0, hardware-led, and medical-adjacent.
+- **"Brain rot" positioning.** 93 to 18 in 12 months.
+- **Personal trainer or tutoring software.** Capterra shows the categories well served
+  (PT Distinction 4.9, TrueCoach 4.8, Acuity 4.8); Trends for "personal trainer app" is 0.
 
 ## How to keep using these sources
 
-- **Capterra.** Category pages expose value-for-money and ease-of-use sub-scores; a product
-  with high volume and a value score 0.4 below its overall is a switching market. Review
-  pages list reviewer name, role, and business type; that is your lead list. G2 now owns
-  Capterra, but Capterra still labels incentivized reviews, so trust its 1-stars more.
-- **G2.** Blocks scrapers (403). Use search-indexed "what do you dislike" snippets and the
-  compare pages. Almost everything is above 4.0 there, so read dislikes, not scores.
-- **Consumer Reports.** Thin on apps (one 2021 mental-health privacy study, fitness
-  trackers, junk fees). Use it for positioning claims and trust angles, not for demand.
-- **Google Trends.** Pull it directly with pytrends (works with `retries=0`). Always include
-  one anchor term in every group so groups are comparable, check the 5-year line for
-  structure and the 12-month line for momentum, and read the rising queries: they are
-  where the intent is. Script used for this doc is in `docs/strategy/trends_probe.py`.
-- **Reddit.** Tiebreaker only. r/mindbody, r/pilates, r/gymowner, r/ADHD, r/nosurf.
+- **Capterra.** Category pages expose value-for-money and ease-of-use sub-scores; a
+  high-volume product with a value score 0.4 below its overall is a switching market.
+  Review pages list reviewer role and business type: that is a lead list.
+- **G2.** Blocks scrapers (403). Read search-indexed "what do you dislike" snippets and the
+  compare pages; nearly everything scores above 4.0 so read dislikes, not scores.
+- **Consumer Reports.** Thin on apps. Use it for trust and pricing claims, not demand.
+- **Google Trends.** `trends_probe.py` (pytrends, `retries=0`). Anchor term in every group,
+  5-year line for structure, 12-month line for momentum, rising queries for intent.
+- **Reddit via Arctic Shift.** `reddit_arctic_shift.py`. Text search only works with a single
+  `subreddit` per request; comments use `body=`, posts use `query=`. Recent weeks lag.
+  Vendors astroturf the switching threads; discount comments that name a product in the
+  first sentence.
 
 ## Sequence
 
-| Week | Lead 1 (Mindbody Exit) | Lead 2 (screen time) | Lead 3 (ADHD) |
+| Week | Lead 1 (Mindbody Exit) | Lead 2 (Lock In app) | Lead 3 (blocker) |
 |---|---|---|---|
-| 1 | Free pilot migration, checklist, testimonial | Submit FamilyControls request | Paywall + brand promises drafted |
-| 2 | 20 touches/day, sell $199 audits | Wait | Build voice loop if Lead 1 pipeline is full |
-| 3 | First paid migrations | Wait | TestFlight with 20 r/ADHD users |
-| 4 | 4-6 migrations booked ($5-9K) | Build if approved | Submit to App Store |
+| 1 | Free pilot migration, checklist, testimonial | Room + timer + paywall | Submit FamilyControls request |
+| 2 | 20 touches/day, sell $199 audits | TestFlight with 30 Reddit recruits | Wait |
+| 3 | First paid migrations | App Store submit, daily lock-in TikToks | Wait |
+| 4 | 4-6 migrations booked ($5-9K) | Student-discount page, campus Discords | Build if approved |
