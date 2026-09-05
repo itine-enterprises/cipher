@@ -104,6 +104,27 @@ campaign during the parallel week: email and text sequence, tablet at check-in, 
 confirmed before Mindbody autopays are cancelled. Case C is the common one and is most of the
 migration's value.
 
+### Compliance rules, non-negotiable
+
+- **Notices come from the owner.** We draft the non-renewal notice; the owner sends it from the
+  email on the Mindbody account; we keep the acknowledgement. A notice from us can be treated as
+  unauthorised and the term auto-renews.
+- **No shared logins.** We are added as a staff user with the permissions we need, or the owner
+  drives on a screen share. Card data is cleared by the owner's staff user, never by us.
+- **We never handle card numbers.** The paid export goes from Mindbody to the new processor.
+  We coordinate; we do not receive PANs.
+- **Client messages go out from the studio.** The re-card campaign is sent from the studio's
+  own platform or email, in the studio's name, as a transactional notice about billing. No
+  marketing, no messages from our accounts, no texts without the studio's existing consent.
+- **Data handling.** We receive exports only for the migration, keep them on encrypted storage,
+  delete them within 30 days of cutover, and never reuse client lists.
+- **No billing promises.** Mindbody bills to the end of the term. The plan is timed to the term
+  end; we do not promise "one bill" or "no double billing".
+- **Not legal advice, not affiliated.** Every page and report carries the line: business
+  consulting, not a law firm; not affiliated with Mindbody.
+- **Before the first paid migration:** the engagement letter in `engagement-letter.md`, and
+  errors-and-omissions insurance once there is revenue.
+
 ### Phase 2: analysis in Claude, saved as a skill after the third one
 
 Feed the transcript, the invoices, and the contract. The prompt is Corey's with the
