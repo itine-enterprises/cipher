@@ -235,28 +235,43 @@ def one_star_reviews(slug, max_pages=REVIEW_PAGES, horizon_days=730):
     page is older than `horizon_days`. That makes the last-12mo / 12-24mo
     counts exact (not capped) while keeping request volume bounded; `max_pages`
     is only a safety cap for plugins with enormous recent 1-star volume."""
+    # NOTE: wordpress.org silently ignores a `?page=N` query parameter and
+    # returns page 1 again. Pagination only works in path form
+    # (/reviews/page/N/?filter=1), where the star filter does persist. The
+    # original script used the query form, so it re-scraped page 1 N times and
+    # every count came out as (page-1 count x pages). We also de-duplicate by
+    # topic permalink and stop if a page repeats, as a guard.
     items_out = []
+    seen = set()
     for page in range(1, max_pages + 1):
-        url = f"https://wordpress.org/support/plugin/{slug}/reviews/"
-        r = fetch_html(url, params={"filter": 1, "page": page})
+        base = f"https://wordpress.org/support/plugin/{slug}/reviews/"
+        url = base if page == 1 else f"{base}page/{page}/"
+        r = fetch_html(url, params={"filter": 1})
         if r.status_code != 200:
             break
         soup = BeautifulSoup(r.text, "html.parser")
         items = soup.select("li.bbp-topic-freshness")
         if not items:
             break
-        page_ages = []
+        page_ages, new_on_page = [], 0
         for it in items:
             t = it.get_text(" ", strip=True)
             if "ago" not in t:
                 continue
-            age = rel_to_days(t)
             row = it.parent
             a = row.select_one("a.bbp-topic-permalink") if row else None
+            key = a.get("href") if a else t
+            if key in seen:
+                continue
+            seen.add(key)
+            new_on_page += 1
+            age = rel_to_days(t)
             title = a.get_text(" ", strip=True)[:120] if a else ""
             items_out.append((age, title))
             page_ages.append(age)
         time.sleep(SLEEP)
+        if new_on_page == 0:
+            break  # page repeated or empty: end of listing
         if page_ages and min(page_ages) > horizon_days:
             break  # everything from here on is older than we count
     return items_out

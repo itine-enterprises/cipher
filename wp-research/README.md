@@ -61,6 +61,15 @@ dataset used). Notes:
 
 ## Parser fixes (v2)
 
+- **Review pagination was broken in the original script (critical).**
+  wordpress.org silently ignores a `?page=N` query parameter and returns page 1
+  again. The original scraper used that form, so it re-fetched page 1 on every
+  iteration and every review count came out as (page-1 count × pages). That is
+  why every v1 candidate showed exactly 360 scraped reviews and recent counts
+  that were multiples of 12. Pagination now uses the path form
+  (`/reviews/page/N/?filter=1`), where the star filter persists, with
+  de-duplication by topic permalink and a stop-on-repeat guard. **Any
+  review-recency figure produced before this fix should be discarded.**
 - **Download history** now comes from the stats API
   (`stats/plugin/1.0/downloads.php?slug=…&historical_summary=1`). The plugin
   "Advanced" page renders those numbers client-side; its HTML only carries the
