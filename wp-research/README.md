@@ -34,9 +34,9 @@ When the key is unset it falls back to direct requests (what the committed
 dataset used). Notes:
 - The JSON APIs (plugin info, version stats) never use Firecrawl — they are
   plain APIs, not scraping, so routing them would waste credits.
-- Firecrawl bills ~1 credit per page. The default bounded run is
-  `ENRICH_TOP * REVIEW_PAGES` = 30 * 12 = ~360 page fetches, which fits the free
-  tier. Enriching all 119 candidates at 12 pages (~1400 fetches) does not.
+- Firecrawl bills ~1 credit per page. With early-stop pagination most plugins
+  need only 1-3 review pages, so the default top-40 run is on the order of 100-200
+  page fetches, which fits the free tier comfortably.
 - For these specific pages Firecrawl does not improve data quality — the pages
   are plain server-rendered HTML that direct requests already parse. Its only
   benefit here is proxying to avoid rate limits at larger scale.
@@ -45,19 +45,21 @@ dataset used). Notes:
 ## Outputs (`results/`)
 
 - `all_plugins.csv` — every plugin pulled (3299), with metrics.
-- `candidates.csv` — the 119 plugins passing the candidate filter; the top 30 by
+- `candidates.csv` — the 119 plugins passing the candidate filter; the top 40 by
   pre-score also carry the scraped enrichment columns.
-- `summary.md` — the 30 enriched candidates, ranked by `seam_score`.
+- `summary.md` — the 40 enriched candidates, ranked by `seam_score`.
+- `top10_analysis.md` — the top 10 with one-line complaint themes, the highest
+  scoring independent plugins, and the headline finding.
+- `one_star_titles.json` — recent (≤12mo) 1-star review titles per enriched plugin.
+- `ownership_verification.md` — per-author evidence for the ownership corrections.
 
 ## Method
 
 1. **Pull** — popular pages 1-2 plus 12 category tags (250/page), deduped by slug.
 2. **Candidate filter** — installs >= 10k, reviews >= 20, and (avg < 4.0 or 1-star% >= 15).
-3. **Enrichment (bounded)** — only the top `ENRICH_TOP=30` candidates by a cheap
-   pre-score are scraped, at `REVIEW_PAGES=12` pages each (~360 recent reviews max),
-   to keep the total request volume modest. The original single-session script
-   enriched all candidates at 40 pages; that is thousands of requests and is not
-   run here.
+3. **Enrichment (bounded)** — only the top `ENRICH_TOP=40` candidates by a cheap
+   pre-score are scraped. Pagination stops once a page is entirely older than 24
+   months, so recent counts are exact; `REVIEW_PAGES=40` is only a safety cap.
 
 ## Parser fixes (v2)
 
