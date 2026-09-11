@@ -10,7 +10,7 @@ Usage:
     pip install requests beautifulsoup4
     python wp_seam_miner.py
 
-Outputs (in ./out/):
+Outputs (in ./results/):
     all_plugins.csv   every plugin pulled, with metrics
     candidates.csv    filtered candidates; top ENRICH_TOP enriched
     summary.md        ranked table for reading
@@ -27,6 +27,17 @@ HDR = {"User-Agent": "seam-miner/1.0 (research; contact via wordpress.org profil
 SLEEP = 1.5
 OUT = "results"
 os.makedirs(OUT, exist_ok=True)
+
+# Optional Firecrawl (firecrawl.dev) routing for the HTML page scrapes
+# (review pages + advanced page). When FIRECRAWL_API_KEY is set, those fetches
+# go through Firecrawl's proxy so a larger run doesn't get this IP throttled;
+# otherwise they fall back to direct requests. The JSON APIs (plugin info,
+# version stats) never use Firecrawl -- they are plain APIs, not scraping.
+# Budget note: Firecrawl bills ~1 credit per page; the free tier is ~500-1000
+# credits/month. The default bounded run is ~ENRICH_TOP * REVIEW_PAGES fetches.
+FIRECRAWL_KEY = os.environ.get("FIRECRAWL_API_KEY", "")
+FIRECRAWL_URL = os.environ.get("FIRECRAWL_API_URL", "https://api.firecrawl.dev/v2/scrape")
+_fc_credits = {"pages": 0}
 
 POPULAR_PAGES = 2
 TAGS = ["forms", "booking", "appointments", "membership", "lms", "backup",
@@ -61,6 +72,46 @@ def get(url, **kw):
             time.sleep(15 * (attempt + 1)); continue
         return r
     return r
+
+
+class _Resp:
+    """Minimal response shim so Firecrawl output is a drop-in for requests.get."""
+    def __init__(self, status_code, text):
+        self.status_code = status_code
+        self.text = text
+
+
+def _encode(url, params):
+    if not params:
+        return url
+    from urllib.parse import urlencode
+    return f"{url}?{urlencode(params)}"
+
+
+def fetch_html(url, params=None):
+    """Fetch an HTML page. Routes through Firecrawl when FIRECRAWL_API_KEY is
+    set (with a direct-request fallback on any error); otherwise fetches
+    directly. Returns an object exposing .status_code and .text."""
+    full = _encode(url, params)
+    if FIRECRAWL_KEY:
+        try:
+            r = requests.post(
+                FIRECRAWL_URL,
+                headers={"Authorization": f"Bearer {FIRECRAWL_KEY}",
+                         "Content-Type": "application/json"},
+                json={"url": full, "formats": ["rawHtml"], "onlyMainContent": False},
+                timeout=60,
+            )
+            if r.status_code == 200:
+                d = r.json()
+                html = (d.get("data") or {}).get("rawHtml") or ""
+                if html:
+                    _fc_credits["pages"] += 1
+                    return _Resp(200, html)
+            # fall through to direct on non-200 or empty payload
+        except Exception:
+            pass
+    return get(url, params=params)
 
 
 def query(params):
@@ -156,7 +207,7 @@ def one_star_reviews(slug, max_pages=REVIEW_PAGES):
     ages = []
     for page in range(1, max_pages + 1):
         url = f"https://wordpress.org/support/plugin/{slug}/reviews/"
-        r = get(url, params={"filter": 1, "page": page})
+        r = fetch_html(url, params={"filter": 1, "page": page})
         if r.status_code != 200:
             break
         soup = BeautifulSoup(r.text, "html.parser")
@@ -172,7 +223,7 @@ def one_star_reviews(slug, max_pages=REVIEW_PAGES):
 
 
 def advanced_page(slug):
-    r = get(f"https://wordpress.org/plugins/{slug}/advanced/")
+    r = fetch_html(f"https://wordpress.org/plugins/{slug}/advanced/")
     out = {"dl_yesterday": None, "dl_7d": None, "dl_all": None}
     if r.status_code != 200:
         return out
@@ -266,6 +317,8 @@ def main():
             f.write(f"| {r['seam_score']} | {r['slug']} | {r['ownership']} | {r['installs']:,} | {r['avg']} | "
                     f"{r['one_star_pct']} | {r['one_star_last_12mo']} | {r['one_star_scraped']} | "
                     f"{r['unresolved_pct']} | {r['version_split']} | {r['polarized']} |\n")
+    if FIRECRAWL_KEY:
+        print(f"Firecrawl: {_fc_credits['pages']} pages fetched (~{_fc_credits['pages']} credits)", flush=True)
     print(f"\nDone. See {OUT}/summary.md", flush=True)
 
 

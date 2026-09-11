@@ -19,6 +19,29 @@ python wp_seam_miner.py      # writes to ./results/
 The script is polite to wordpress.org: 1.5s between requests, backoff on HTTP 429,
 and the review scrape is bounded (see below).
 
+### Optional: route HTML scrapes through Firecrawl
+
+The two HTML scrapes (review pages, advanced page) can go through
+[Firecrawl](https://firecrawl.dev) instead of direct requests, so a larger run
+doesn't get this IP throttled. Set the API key and run:
+
+```
+export FIRECRAWL_API_KEY=fc-...      # free tier is ~500-1000 credits/month
+python wp_seam_miner.py
+```
+
+When the key is unset it falls back to direct requests (what the committed
+dataset used). Notes:
+- The JSON APIs (plugin info, version stats) never use Firecrawl — they are
+  plain APIs, not scraping, so routing them would waste credits.
+- Firecrawl bills ~1 credit per page. The default bounded run is
+  `ENRICH_TOP * REVIEW_PAGES` = 30 * 12 = ~360 page fetches, which fits the free
+  tier. Enriching all 119 candidates at 12 pages (~1400 fetches) does not.
+- For these specific pages Firecrawl does not improve data quality — the pages
+  are plain server-rendered HTML that direct requests already parse. Its only
+  benefit here is proxying to avoid rate limits at larger scale.
+- `FIRECRAWL_API_URL` overrides the endpoint (default `.../v2/scrape`).
+
 ## Outputs (`results/`)
 
 - `all_plugins.csv` — every plugin pulled (3299), with metrics.
