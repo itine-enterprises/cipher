@@ -59,19 +59,41 @@ dataset used). Notes:
    enriched all candidates at 40 pages; that is thousands of requests and is not
    run here.
 
+## Parser fixes (v2)
+
+- **Download history** now comes from the stats API
+  (`stats/plugin/1.0/downloads.php?slug=…&historical_summary=1`). The plugin
+  "Advanced" page renders those numbers client-side; its HTML only carries the
+  localisation labels, which is why the original text scrape returned nothing.
+- **Review pagination stops early.** Reviews list newest-first, so the scraper
+  now stops once a whole page is older than 24 months instead of at a fixed page
+  count. `one_star_last_12mo` and `one_star_12_24mo` are therefore exact counts,
+  not capped at the page limit (v1 saturated at 360 for busy plugins). The
+  40-page limit is only a safety cap.
+- **Review titles are captured** for the recent (≤12mo) 1-star reviews:
+  `one_star_titles_recent` in `candidates.csv` (first 40) and the full lists in
+  `results/one_star_titles.json`.
+
+## Ownership verification
+
+`ownership` is a lookup against the `CAPTIVE_AUTHORS` set. In v2 every `indie?`
+candidate with ≥30k installs was checked against its live profile page; 21 authors
+(23 plugin rows) turned out to be platforms, big-tech, hosting-owned, or serial
+acquirers and were moved to captive/rollup. Several v1 entries also used the
+wrong slug (`wpmedia` vs the real `wp_media`, `brevo` vs `neeraj_slit`,
+`microsoft` vs `bingwebmastertools`, `wpdeveloper` vs `wpdevteam`). The full
+per-author evidence is in `results/ownership_verification.md`. Remaining
+`indie?` rows below 30k installs are unverified.
+
 ## Caveats (read before using the numbers)
 
-- **Review recency is capped.** For high-traffic plugins the 12-page cap only
-  reaches the most recent ~360 1-star reviews, so `one_star_last_12mo` and
-  `one_star_recent_share_pct` saturate (e.g. 360/360) and understate total lifetime
-  1-star volume. Treat them as a "recent complaint intensity" signal, not a full count.
-- **`dl_yesterday` / `dl_7d` / `dl_all` are blank.** The plugin "Advanced" page no
-  longer exposes these as scrapable text; the selector returns nothing. Version
-  split (from the stats API) is populated instead.
-- **`ownership` is heuristic.** "captive/rollup" vs "indie?" is a lookup against a
-  hand-maintained author list (`CAPTIVE_AUTHORS`); "indie?" means "not on the list,"
-  not verified independent ownership.
+- **`ownership` is still a heuristic below 30k installs.** Above that threshold
+  it has been verified (see above); below it, "indie?" means "not on the list."
 - **`seam_score` is a ranking heuristic**, not a measurement: recent 1-star volume x
   sqrt(installs/100k), down-weighted 0.3x for captive/rollup owners.
+- **Only the top `ENRICH_TOP` candidates by pre-score are enriched.** Candidates
+  outside that set have blank enrichment columns and no `seam_score`.
+- **1-star review titles** are the reviewer's own words and are provided as data
+  for theme analysis, not as verified facts about the plugin.
 
 Snapshot date: 2026-09-11.

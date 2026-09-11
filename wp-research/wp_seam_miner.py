@@ -16,7 +16,7 @@ Outputs (in ./results/):
     summary.md        ranked table for reading
 """
 
-import csv, os, re, time, math
+import csv, json, os, re, time, math
 from datetime import datetime, timezone
 
 import requests
@@ -50,8 +50,8 @@ MAX_AVG = 4.0
 MIN_ONE_STAR_PCT = 15.0
 
 # Bounds for the expensive review-scraping enrichment.
-ENRICH_TOP = 30        # only enrich the top-N candidates by pre-score
-REVIEW_PAGES = 12      # cap review pages per candidate (recent-first)
+ENRICH_TOP = 40        # only enrich the top-N candidates by pre-score
+REVIEW_PAGES = 40      # safety cap; pagination stops early past the 24-month horizon
 
 CAPTIVE_AUTHORS = {
     "automattic", "woocommerce", "wordpressdotorg", "jetpack", "crowdsignal",
@@ -62,6 +62,31 @@ CAPTIVE_AUTHORS = {
     "smub", "wpbeginner", "awesomemotive", "optinmonster", "exactmetrics",
     "monsterinsights", "wpforms", "aioseo", "wpmedia", "10up", "melapress",
     "wpdeveloper", "yithemes", "themeisle", "brainstormforce", "wpengine",
+    # --- Verified 2026-09-11 against live profiles.wordpress.org pages for every
+    # "indie?" candidate with >=30k installs. Several entries above used the
+    # wrong slug (the real ones are below); the rest are platforms, big-tech,
+    # or serial acquirers whose profile lists dozens of unrelated bought plugins.
+    "wp_media",             # WP Media (WP Rocket/Imagify; group.one). Owns BackWPup, Adminimize...
+    "neeraj_slit",          # Brevo (ex-Sendinblue) corporate account
+    "bingwebmastertools",   # Microsoft Bing
+    "tiktokbusinessplugin", # TikTok
+    "sucuri",               # Sucuri, owned by GoDaddy
+    "woothemes",            # WooThemes = Automattic
+    "mercadopago",          # Mercado Pago / Mercado Livre
+    "razorpay",             # Razorpay (fintech)
+    "mollieintegration",    # Mollie (payments)
+    "printful",             # Printful
+    "performanceteam",      # WordPress Performance Team (core / Google-sponsored)
+    "westonruter",          # profile: "WP Engine · Full-time"; AMP plugin
+    "johnjamesjacoby",      # profile company: Awesome Motive; bbPress
+    "data443",              # Data443 Risk Mitigation (OTC-listed); 13 acquired plugins
+    "webfactory",           # WebFactory Ltd; 110 plugins, serial acquirer
+    "wp-buy",               # "Premium WordPress Plugins"; 94 plugins, serial acquirer
+    "wpdevteam",            # WPDeveloper's real slug; 49 plugins incl. acquired Simple 301 Redirects
+    "softaculous",          # Softaculous Ltd; acquired Loginizer, Backuply, SpeedyCache, Pagelayer...
+    "wpkube",               # WPKube media site; 11 acquired plugins
+    "properfraction",       # ProfilePress; acquired WP User Avatar, MailOptin, kk Star Ratings...
+    "saadiqbal",            # WPExperts.io; 53 plugins, serial acquirer (CF7 Honeypot etc.)
 }
 
 
@@ -203,8 +228,14 @@ def rel_to_days(text):
     return days
 
 
-def one_star_reviews(slug, max_pages=REVIEW_PAGES):
-    ages = []
+def one_star_reviews(slug, max_pages=REVIEW_PAGES, horizon_days=730):
+    """Return list of (age_days, title) for 1-star reviews, most recent first.
+
+    Reviews are listed newest-first, so pagination stops early once a whole
+    page is older than `horizon_days`. That makes the last-12mo / 12-24mo
+    counts exact (not capped) while keeping request volume bounded; `max_pages`
+    is only a safety cap for plugins with enormous recent 1-star volume."""
+    items_out = []
     for page in range(1, max_pages + 1):
         url = f"https://wordpress.org/support/plugin/{slug}/reviews/"
         r = fetch_html(url, params={"filter": 1, "page": page})
@@ -214,25 +245,41 @@ def one_star_reviews(slug, max_pages=REVIEW_PAGES):
         items = soup.select("li.bbp-topic-freshness")
         if not items:
             break
+        page_ages = []
         for it in items:
             t = it.get_text(" ", strip=True)
-            if "ago" in t:
-                ages.append(rel_to_days(t))
+            if "ago" not in t:
+                continue
+            age = rel_to_days(t)
+            row = it.parent
+            a = row.select_one("a.bbp-topic-permalink") if row else None
+            title = a.get_text(" ", strip=True)[:120] if a else ""
+            items_out.append((age, title))
+            page_ages.append(age)
         time.sleep(SLEEP)
-    return ages
+        if page_ages and min(page_ages) > horizon_days:
+            break  # everything from here on is older than we count
+    return items_out
 
 
 def advanced_page(slug):
-    r = fetch_html(f"https://wordpress.org/plugins/{slug}/advanced/")
+    """Download history. The plugin 'Advanced' page renders these numbers
+    client-side from the stats API (the HTML only carries the l10n labels), so
+    we call that API directly instead of scraping the page."""
     out = {"dl_yesterday": None, "dl_7d": None, "dl_all": None}
-    if r.status_code != 200:
-        return out
-    soup = BeautifulSoup(r.text, "html.parser")
-    txt = soup.get_text(" ", strip=True)
-    for key, label in (("dl_yesterday", "Yesterday"), ("dl_7d", "Last 7 Days"), ("dl_all", "All Time")):
-        m = re.search(label + r"\s+([\d,]+)", txt)
-        if m:
-            out[key] = int(m.group(1).replace(",", ""))
+    try:
+        r = get("https://api.wordpress.org/stats/plugin/1.0/downloads.php",
+                params={"slug": slug, "historical_summary": 1})
+        if r.status_code == 200:
+            d = r.json()
+            def num(k):
+                v = d.get(k)
+                return int(str(v).replace(",", "")) if v not in (None, "") else None
+            out["dl_yesterday"] = num("yesterday")
+            out["dl_7d"] = num("last_week")
+            out["dl_all"] = num("all_time")
+    except Exception:
+        pass
     return out
 
 
@@ -256,7 +303,8 @@ def pre_score(r):
 
 
 ENRICH_KEYS = ["one_star_scraped", "one_star_last_12mo", "one_star_12_24mo",
-               "one_star_recent_share_pct", "dl_yesterday", "dl_7d", "dl_all",
+               "one_star_recent_share_pct", "one_star_titles_recent",
+               "dl_yesterday", "dl_7d", "dl_all",
                "version_split", "polarized", "pre_score", "enriched", "seam_score"]
 
 
@@ -283,12 +331,17 @@ def main():
     to_enrich = cands[:ENRICH_TOP]
     print(f"{len(cands)} candidates; enriching top {len(to_enrich)} (bounded)...", flush=True)
 
+    titles_by_slug = {}
     for i, r in enumerate(to_enrich, 1):
-        ages = one_star_reviews(r["slug"])
+        items = one_star_reviews(r["slug"])
+        ages = [a for a, _ in items]
         r["one_star_scraped"] = len(ages)
         r["one_star_last_12mo"] = sum(1 for a in ages if a <= 365)
         r["one_star_12_24mo"] = sum(1 for a in ages if 365 < a <= 730)
         r["one_star_recent_share_pct"] = round(100 * r["one_star_last_12mo"] / len(ages), 1) if ages else None
+        recent_titles = [t for a, t in items if a <= 365 and t]
+        titles_by_slug[r["slug"]] = recent_titles
+        r["one_star_titles_recent"] = " | ".join(recent_titles[:40])
         r.update(advanced_page(r["slug"]))
         r["version_split"] = version_split(r["slug"])
         r["polarized"] = bool(r["five_star_pct"] and r["one_star_pct"]
@@ -299,6 +352,9 @@ def main():
                                 * (0.3 if r["ownership"] != "indie?" else 1.0), 1)
         print(f"  [{i}/{len(to_enrich)}] {r['slug']}: 1* last12mo={r['one_star_last_12mo']} / {len(ages)} score={r['seam_score']}", flush=True)
         time.sleep(SLEEP)
+
+    with open(f"{OUT}/one_star_titles.json", "w") as f:
+        json.dump(titles_by_slug, f, indent=1, ensure_ascii=False)
 
     cands.sort(key=lambda r: (-(r["seam_score"] or -1), -r["pre_score"]))
     fieldnames = list(rows[0].keys()) + ENRICH_KEYS
@@ -311,12 +367,12 @@ def main():
         f.write(f"# WordPress plugin candidate summary\n\n")
         f.write(f"- Plugins pulled: {len(rows)}\n- Candidates: {len(cands)}\n")
         f.write(f"- Enriched (top by pre-score): {len(enriched)}\n\n")
-        f.write("| score | slug | owner | installs | avg | 1*% | 1* last 12mo | scraped | unresolved% | versions | polarized |\n")
-        f.write("|--|--|--|--|--|--|--|--|--|--|--|\n")
+        f.write("| score | slug | owner | installs | avg | 1*% | 1* last 12mo | 12-24mo | unresolved% | dl/day | versions | polarized |\n")
+        f.write("|--|--|--|--|--|--|--|--|--|--|--|--|\n")
         for r in enriched:
             f.write(f"| {r['seam_score']} | {r['slug']} | {r['ownership']} | {r['installs']:,} | {r['avg']} | "
-                    f"{r['one_star_pct']} | {r['one_star_last_12mo']} | {r['one_star_scraped']} | "
-                    f"{r['unresolved_pct']} | {r['version_split']} | {r['polarized']} |\n")
+                    f"{r['one_star_pct']} | {r['one_star_last_12mo']} | {r['one_star_12_24mo']} | "
+                    f"{r['unresolved_pct']} | {r['dl_yesterday']} | {r['version_split']} | {r['polarized']} |\n")
     if FIRECRAWL_KEY:
         print(f"Firecrawl: {_fc_credits['pages']} pages fetched (~{_fc_credits['pages']} credits)", flush=True)
     print(f"\nDone. See {OUT}/summary.md", flush=True)
